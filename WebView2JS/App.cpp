@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 #include "Win.h"
+#include "WebViewEnv.h"
 
 namespace {
 	static App* app;
@@ -49,9 +50,13 @@ void App::init() {
 		return;
 	}
 	app = new App();
+	WebViewEnv::Init();
 }
 App* App::get() {
 	return app;
+}
+void App::webViewReady()
+{
 }
 void App::dispose()
 {

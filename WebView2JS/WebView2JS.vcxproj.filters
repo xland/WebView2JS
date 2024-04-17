@@ -27,6 +27,9 @@
     <ClCompile Include="Win.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="WebViewEnv.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="config.json" />
@@ -41,5 +44,11 @@
     <ClInclude Include="Win.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="WebViewEnv.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

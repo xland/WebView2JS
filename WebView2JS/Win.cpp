@@ -107,34 +107,9 @@ void Win::initCaptionArea()
     rapidjson::Value& areas = config["captionAreas"];
     for (size_t i = 0; i < areas.Size(); i++)
     {
-        auto left{ areas[i]["left"].GetInt() };
-        auto right{ areas[i]["right"].GetInt() };
-        auto top{ areas[i]["top"].GetInt() };
-        auto bottom{ areas[i]["bottom"].GetInt() };
-        auto width{ areas[i]["width"].GetInt() };
-        auto height{ areas[i]["height"].GetInt() };
-        if (left < 0) {
-            left = right - width;
-        }
-        if (top < 0) {
-            top = bottom - height;
-        }
-        if (right < 0) {
-            right = left + width;
-        }
-        else {
-            right = w - right;
-        }
-        if (bottom < 0) {
-            bottom = top + height;
-        }
-        else
-        {
-            bottom = h - bottom;
-        }
-        RECT rect{ left,top,right,bottom };
+        auto rect = areaToRect(areas[i], w, h);
         HRGN hRectRgn = CreateRectRgnIndirect(&rect);
-        auto appendType = areas[i]["isAppend"].GetBool() ? RGN_OR: RGN_AND;
+        auto appendType = areas[i]["isAppend"].GetBool() ? RGN_OR: RGN_DIFF;
         CombineRgn(rgn, rgn, hRectRgn, appendType);
         DeleteObject(hRectRgn);
     }

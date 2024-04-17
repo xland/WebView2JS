@@ -23,3 +23,33 @@ std::wstring convertToWideChar(const std::string& str)
     MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, &wstr[0], count);
     return wstr;
 }
+
+RECT areaToRect(rapidjson::Value& area, const int& w, const int& h)
+{
+    auto left{ area["left"].GetInt() };
+    auto right{ area["right"].GetInt() };
+    auto top{ area["top"].GetInt() };
+    auto bottom{ area["bottom"].GetInt() };
+    auto width{ area["width"].GetInt() };
+    auto height{ area["height"].GetInt() };
+    if (right < 0) {
+        right = left + width;
+    }
+    else {
+        right = w - right;
+    }
+    if (bottom < 0) {
+        bottom = top + height;
+    }
+    else
+    {
+        bottom = h - bottom;
+    }
+    if (left < 0) {
+        left = right - width;
+    }
+    if (top < 0) {
+        top = bottom - height;
+    }
+    return RECT{ left,top,right,bottom };
+}
