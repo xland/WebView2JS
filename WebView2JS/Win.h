@@ -1,6 +1,11 @@
 #pragma once
 #include <rapidjson/document.h>
 #include <Windows.h>
+#include <wrl.h>
+#include <wil/com.h>
+#include <WebView2.h>
+#include <vector>
+
 class Win
 {
 public:
@@ -15,7 +20,10 @@ private:
 	void initWindow();
 	int nctest(const int& x, const int& y);
 	void initCaptionArea();
+	bool createPageController();
+	HRESULT pageCtrlCallBack(HRESULT result, ICoreWebView2Controller* controller);
 	rapidjson::Value& config;
+	std::vector<ICoreWebView2Controller*> ctrls;
 	HRGN rgn;
 };
 

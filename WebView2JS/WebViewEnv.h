@@ -20,6 +20,5 @@ private:
 	std::filesystem::path ensureAppFolder();
 	bool checkRegKey(const HKEY& key, const std::wstring& subKey);
 	bool checkRuntime();
-	std::function<void()> func;
 };
 

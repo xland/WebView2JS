@@ -116,6 +116,6 @@ bool WebViewEnv::checkRuntime()
 HRESULT WebViewEnv::callBack(HRESULT result, ICoreWebView2Environment* env)
 {
     this->env = env;
-    App::webViewReady();
+    App::webViewEnvReady();
     return S_OK;
 }

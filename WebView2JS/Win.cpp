@@ -3,6 +3,10 @@
 #include <format>
 #include <windowsx.h>
 #include <dwmapi.h>
+#include "WebViewEnv.h"
+#include "Page.h"
+
+using namespace Microsoft::WRL;
 
 Win::Win(rapidjson::Value& config):config{config}
 {
@@ -191,4 +195,27 @@ LRESULT CALLBACK Win::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     }
     }
     return DefWindowProcW(hWnd, msg, wParam, lParam);
+}
+bool Win::createPageController()
+{
+    auto callBackInstance = Callback<ICoreWebView2CreateCoreWebView2ControllerCompletedHandler>(this, &Win::pageCtrlCallBack);
+    auto env = WebViewEnv::Get()->env;
+    auto result = env->CreateCoreWebView2Controller(hwnd, callBackInstance.Get());
+    if (FAILED(result)) {
+        return false;
+    }
+    return true;
+}
+HRESULT Win::pageCtrlCallBack(HRESULT result, ICoreWebView2Controller* controller)
+{
+    rapidjson::Value& wvs = config["webviews"].GetArray();
+    auto index = ctrls.size();
+    auto rect = areaToRect(wvs[index]["area"], w, h);
+    HRESULT hr;
+    hr = controller->put_Bounds(rect);
+    wil::com_ptr<ICoreWebView2> webview;
+    hr = controller->get_CoreWebView2(&webview);
+    page = new Page(webview, this);
+    ctrls.push_back(controller);
+    return hr;
 }

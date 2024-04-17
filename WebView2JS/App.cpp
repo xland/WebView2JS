@@ -20,7 +20,6 @@ namespace {
 App::App()
 {
 	initConfig();
-	initWindow();
 }
 void App::initConfig()
 {
@@ -29,14 +28,6 @@ void App::initConfig()
 	std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 	//auto str = convertToWideChar(content);
 	d.Parse(content.c_str());
-}
-void App::initWindow()
-{
-	rapidjson::Value& winConfigs = d["windows"].GetArray();
-	for (size_t i = 0; i < winConfigs.Size(); i++)
-	{
-		wins.push_back(new Win(winConfigs[i]));
-	}
 }
 App::~App()
 {
@@ -55,8 +46,13 @@ void App::init() {
 App* App::get() {
 	return app;
 }
-void App::webViewReady()
+void App::webViewEnvReady()
 {
+	rapidjson::Value& winConfigs = d["windows"].GetArray();
+	for (size_t i = 0; i < winConfigs.Size(); i++)
+	{
+		wins.push_back(new Win(winConfigs[i]));
+	}
 }
 void App::dispose()
 {

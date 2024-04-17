@@ -7,10 +7,9 @@ public:
 	static void init();
 	static void dispose();
 	static App* get();
-	static void webViewReady();
+	static void webViewEnvReady();
 private:
 	App();
 	void initConfig();
-	void initWindow();
 };
 
