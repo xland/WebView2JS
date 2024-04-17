@@ -13,6 +13,9 @@ private:
 	LRESULT CALLBACK wndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 	void initSizeAndPos();
 	void initWindow();
+	int nctest(const int& x, const int& y);
+	void initCaptionArea();
 	rapidjson::Value& config;
+	HRGN rgn;
 };
 

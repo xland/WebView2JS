@@ -21,7 +21,8 @@
           "top": 0,
           "bottom": -1,
           "width": -1,
-          "height": 50
+          "height": 50,
+          "isAppend": true
         }
       ],
       "webviews": [
