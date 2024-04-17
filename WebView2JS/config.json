@@ -1,0 +1,44 @@
+{
+  "app": "allen",
+  "windows": [
+    {
+      "id": "FirstWindow",
+      "w": 1200,
+      "h": 800,
+      "resizable": true,
+      "title": "WebView2JS窗口",
+      "frame": false,
+      "shadow": true,
+      "position": {
+        "x": 100,
+        "y": 100,
+        "centerOfScreen": true
+      },
+      "captionAreas": [
+        {
+          "left": 0,
+          "right": 0,
+          "top": 0,
+          "bottom": -1,
+          "width": -1,
+          "height": 50
+        }
+      ],
+      "webviews": [
+        {
+          "id": "FirstWebView",
+          "url": "https://www.baidu.com",
+          "disableWindowOpen": null,
+          "area": {
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": -1,
+            "height": -1
+          }
+        }
+      ]
+    }
+  ]
+}
