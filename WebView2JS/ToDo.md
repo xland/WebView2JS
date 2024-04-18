@@ -1,0 +1,6 @@
+- 为多个WebView添加Splitter
+- webview的area要支持百分数
+- 自定义SCHEMA
+- 加载自定义页面
+- 公开脚本API
+- 拖动改变无边框窗口的位置

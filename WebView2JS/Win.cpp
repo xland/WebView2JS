@@ -3,8 +3,7 @@
 #include <format>
 #include <windowsx.h>
 #include <dwmapi.h>
-#include "WebViewEnv.h"
-#include "Page.h"
+#include "App.h"
 
 using namespace Microsoft::WRL;
 
@@ -12,11 +11,20 @@ Win::Win(rapidjson::Value& config):config{config}
 {
     initSizeAndPos();
     initWindow();
+    createPageController();
 }
 
 Win::~Win()
 {
-    DeleteObject(rgn);
+    //DeleteObject(rgn);
+    for (size_t i = 0; i < webviews.size(); i++)
+    {
+        webviews[i]->Release();
+    }
+    for (size_t i = 0; i < ctrls.size(); i++)
+    {
+        ctrls[i]->Release();
+    }
 }
 
 void Win::initSizeAndPos()
@@ -59,8 +67,8 @@ void Win::initWindow()
     hwnd = CreateWindowEx(NULL, wcx.lpszClassName, title.c_str(), WS_VISIBLE | WS_OVERLAPPEDWINDOW,
         x, y, w, h, NULL, NULL, hinstance, static_cast<LPVOID>(this));
     if (!config["frame"].GetBool()) {
-        rgn = CreateRectRgn(0, 0, 0, 0);
-        initCaptionArea();
+        //rgn = CreateRectRgn(0, 0, 0, 0);
+        //initCaptionArea();
         if (config["shadow"].GetBool()) {
             DWMNCRENDERINGPOLICY policy = DWMNCRP_ENABLED;
             DwmSetWindowAttribute(hwnd, DWMWA_NCRENDERING_POLICY, &policy, sizeof(policy));
@@ -68,6 +76,8 @@ void Win::initWindow()
             DwmExtendFrameIntoClientArea(hwnd, &margins);
         }
     }
+    ShowWindow(hwnd, SW_SHOW);
+    UpdateWindow(hwnd);
 }
 
 int Win::nctest(const int& x, const int& y)
@@ -97,27 +107,27 @@ int Win::nctest(const int& x, const int& y)
     else if (x < size && y < h - size && y>size) {
         return HTLEFT;
     }
-    else if (PtInRegion(rgn, x, y)) {
-        return HTCAPTION;
-    }
+    //else if (PtInRegion(rgn, x, y)) {
+    //    return HTCAPTION;
+    //}
     else {
         return HTCLIENT;
     }
 }
 
-void Win::initCaptionArea()
-{
-    SetRectRgn(rgn, 0, 0, 0, 0);
-    rapidjson::Value& areas = config["captionAreas"];
-    for (size_t i = 0; i < areas.Size(); i++)
-    {
-        auto rect = areaToRect(areas[i], w, h);
-        HRGN hRectRgn = CreateRectRgnIndirect(&rect);
-        auto appendType = areas[i]["isAppend"].GetBool() ? RGN_OR: RGN_DIFF;
-        CombineRgn(rgn, rgn, hRectRgn, appendType);
-        DeleteObject(hRectRgn);
-    }
-}
+//void Win::initCaptionArea()
+//{
+//    SetRectRgn(rgn, 0, 0, 0, 0);
+//    rapidjson::Value& areas = config["captionAreas"];
+//    for (size_t i = 0; i < areas.Size(); i++)
+//    {
+//        auto rect = areaToRect(areas[i], w, h);
+//        HRGN hRectRgn = CreateRectRgnIndirect(&rect);
+//        auto appendType = areas[i]["isAppend"].GetBool() ? RGN_OR: RGN_DIFF;
+//        CombineRgn(rgn, rgn, hRectRgn, appendType);
+//        DeleteObject(hRectRgn);
+//    }
+//}
 
 LRESULT CALLBACK Win::RouteWindowMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     if (msg == WM_NCCREATE)
@@ -132,6 +142,7 @@ LRESULT CALLBACK Win::RouteWindowMessage(HWND hWnd, UINT msg, WPARAM wParam, LPA
     }
     return DefWindowProc(hWnd, msg, wParam, lParam);
 }
+
 LRESULT CALLBACK Win::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch (msg)
@@ -187,6 +198,12 @@ LRESULT CALLBACK Win::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     case WM_SIZE: {
         this->w = LOWORD(lParam);
         this->h = HIWORD(lParam);
+        rapidjson::Value& wvs = config["webviews"].GetArray();
+        for (size_t i = 0; i < ctrls.size(); i++)
+        {            
+            auto rect = areaToRect(wvs[i]["area"], w, h);
+            ctrls[i]->SetBoundsAndZoomFactor(rect, 1.0);
+        }
         return true;
     }
     case WM_DESTROY: {
@@ -196,26 +213,42 @@ LRESULT CALLBACK Win::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     }
     return DefWindowProcW(hWnd, msg, wParam, lParam);
 }
+
 bool Win::createPageController()
 {
+    rapidjson::Value& wvs = config["webviews"].GetArray();
+    auto env = App::getWebViewEnv();
     auto callBackInstance = Callback<ICoreWebView2CreateCoreWebView2ControllerCompletedHandler>(this, &Win::pageCtrlCallBack);
-    auto env = WebViewEnv::Get()->env;
-    auto result = env->CreateCoreWebView2Controller(hwnd, callBackInstance.Get());
-    if (FAILED(result)) {
-        return false;
+    for (size_t i = 0; i < wvs.Size(); i++)
+    {
+        auto result = env->CreateCoreWebView2Controller(hwnd, callBackInstance.Get());
+        if (FAILED(result)) {
+            return false;
+        }
     }
     return true;
 }
+
 HRESULT Win::pageCtrlCallBack(HRESULT result, ICoreWebView2Controller* controller)
 {
+    HRESULT hr;
+
+    ICoreWebView2* webview;
+    hr = controller->get_CoreWebView2(&webview);
+    webviews.push_back(webview);
+    wil::com_ptr<ICoreWebView2Settings> settings;
+    webview->get_Settings(&settings);
+    settings->put_IsScriptEnabled(TRUE);
+    settings->put_AreDefaultScriptDialogsEnabled(TRUE);
+    settings->put_IsWebMessageEnabled(TRUE);
     rapidjson::Value& wvs = config["webviews"].GetArray();
     auto index = ctrls.size();
     auto rect = areaToRect(wvs[index]["area"], w, h);
-    HRESULT hr;
     hr = controller->put_Bounds(rect);
-    wil::com_ptr<ICoreWebView2> webview;
-    hr = controller->get_CoreWebView2(&webview);
-    page = new Page(webview, this);
     ctrls.push_back(controller);
-    return hr;
+    auto url = convertToWideChar(wvs[index]["url"].GetString());
+    hr = webview->Navigate(url.c_str());
+    //webview->OpenDevToolsWindow();
+
+    return hr;    
 }

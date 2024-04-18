@@ -1,5 +1,5 @@
 {
-  "app": "allen",
+  "appName": "WebView2JS",
   "windows": [
     {
       "id": "FirstWindow",
@@ -7,24 +7,13 @@
       "h": 800,
       "resizable": true,
       "title": "WebView2JS窗口",
-      "frame": false,
+      "frame": true,
       "shadow": true,
       "position": {
         "x": 100,
         "y": 100,
         "centerOfScreen": true
       },
-      "captionAreas": [
-        {
-          "left": 0,
-          "right": 0,
-          "top": 0,
-          "bottom": -1,
-          "width": -1,
-          "height": 50,
-          "isAppend": true
-        }
-      ],
       "webviews": [
         {
           "id": "FirstWebView",
@@ -32,10 +21,23 @@
           "disableWindowOpen": null,
           "area": {
             "left": 0,
-            "right": 0,
+            "right": 500,
             "top": 0,
             "bottom": 0,
             "width": -1,
+            "height": -1
+          }
+        },
+        {
+          "id": "SecondWebView",
+          "url": "https://www.cnblogs.com",
+          "disableWindowOpen": null,
+          "area": {
+            "left": -1,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 500,
             "height": -1
           }
         }

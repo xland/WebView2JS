@@ -11,6 +11,7 @@ class Win
 public:
 	Win(rapidjson::Value& config);
 	~Win();
+	bool createPageController();
 	int x, y, w, h;
 	HWND hwnd;
 private:
@@ -19,11 +20,11 @@ private:
 	void initSizeAndPos();
 	void initWindow();
 	int nctest(const int& x, const int& y);
-	void initCaptionArea();
-	bool createPageController();
+	//void initCaptionArea();
 	HRESULT pageCtrlCallBack(HRESULT result, ICoreWebView2Controller* controller);
 	rapidjson::Value& config;
-	std::vector<ICoreWebView2Controller*> ctrls;
-	HRGN rgn;
+	std::vector<wil::com_ptr<ICoreWebView2Controller>> ctrls;
+	std::vector<wil::com_ptr<ICoreWebView2>> webviews;
+	//HRGN rgn;
 };
 
