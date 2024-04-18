@@ -27,9 +27,16 @@
     <ClCompile Include="Win.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Host_i.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="HostImpl.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="config.json" />
+    <CopyFileToFolders Include="ui\index.html" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h">
@@ -41,8 +48,26 @@
     <ClInclude Include="Win.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Host_h.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HostImpl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SchemeHandler.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="ToDo.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="Host.idl">
+      <Filter>源文件</Filter>
+    </Midl>
   </ItemGroup>
 </Project>

@@ -17,7 +17,7 @@
       "webviews": [
         {
           "id": "FirstWebView",
-          "url": "https://www.baidu.com",
+          "url": "file:///ui\\index.html",
           "disableWindowOpen": null,
           "area": {
             "left": 0,

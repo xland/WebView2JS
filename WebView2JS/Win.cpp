@@ -76,8 +76,7 @@ void Win::initWindow()
             DwmExtendFrameIntoClientArea(hwnd, &margins);
         }
     }
-    ShowWindow(hwnd, SW_SHOW);
-    UpdateWindow(hwnd);
+
 }
 
 int Win::nctest(const int& x, const int& y)

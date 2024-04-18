@@ -144,6 +144,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="HostImpl.cpp" />
+    <ClCompile Include="Host_i.c" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Util.cpp" />
     <ClCompile Include="Win.cpp" />
@@ -158,11 +160,25 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
+    <ClInclude Include="HostImpl.h" />
+    <ClInclude Include="Host_h.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="SchemeHandler.h" />
     <ClInclude Include="Util.h" />
     <ClInclude Include="Win.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="ToDo.md" />
+    <CopyFileToFolders Include="ui\index.html">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</DeploymentContent>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)ui</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)ui</DestinationFolders>
+    </CopyFileToFolders>
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="Host.idl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
