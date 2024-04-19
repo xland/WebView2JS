@@ -5,6 +5,7 @@
 #include <wil/com.h>
 #include <WebView2.h>
 #include <vector>
+#include "HostImpl.h"
 
 class Win
 {
@@ -25,6 +26,7 @@ private:
 	rapidjson::Value& config;
 	std::vector<wil::com_ptr<ICoreWebView2Controller>> ctrls;
 	std::vector<wil::com_ptr<ICoreWebView2>> webviews;
+	wil::com_ptr<Host> hostObj;
 	//HRGN rgn;
 };
 

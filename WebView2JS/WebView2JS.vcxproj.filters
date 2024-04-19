@@ -27,10 +27,10 @@
     <ClCompile Include="Win.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Host_i.c">
+    <ClCompile Include="HostImpl.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="HostImpl.cpp">
+    <ClCompile Include="Host_i.c">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -48,13 +48,13 @@
     <ClInclude Include="Win.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Host_h.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="HostImpl.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Host_h.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

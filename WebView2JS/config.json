@@ -21,23 +21,10 @@
           "disableWindowOpen": null,
           "area": {
             "left": 0,
-            "right": 500,
-            "top": 0,
-            "bottom": 0,
-            "width": -1,
-            "height": -1
-          }
-        },
-        {
-          "id": "SecondWebView",
-          "url": "https://www.cnblogs.com",
-          "disableWindowOpen": null,
-          "area": {
-            "left": -1,
             "right": 0,
             "top": 0,
             "bottom": 0,
-            "width": 500,
+            "width": -1,
             "height": -1
           }
         }

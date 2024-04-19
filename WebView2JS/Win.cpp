@@ -242,6 +242,7 @@ HRESULT Win::pageCtrlCallBack(HRESULT result, ICoreWebView2Controller* controlle
     settings->put_AreDefaultScriptDialogsEnabled(TRUE);
     settings->put_IsWebMessageEnabled(TRUE);
 
+
     rapidjson::Value& wvs = config["webviews"].GetArray();
     auto index = ctrls.size();
     auto rect = areaToRect(wvs[index]["area"], w, h);
@@ -253,8 +254,15 @@ HRESULT Win::pageCtrlCallBack(HRESULT result, ICoreWebView2Controller* controlle
         webview3->SetVirtualHostNameToFolderMapping(L"wv2js", L"ui", COREWEBVIEW2_HOST_RESOURCE_ACCESS_KIND_ALLOW);
     }
 
+    hostObj = Microsoft::WRL::Make<Host>(this);
+    VARIANT remoteObjectAsVariant = {};
+    hostObj.query_to<IDispatch>(&remoteObjectAsVariant.pdispVal);
+    remoteObjectAsVariant.vt = VT_DISPATCH;
+    webview->AddHostObjectToScript(L"host", &remoteObjectAsVariant);
+    remoteObjectAsVariant.pdispVal->Release();
+
     hr = webview->Navigate(url.c_str());
-    //webview->OpenDevToolsWindow();
+    webview->OpenDevToolsWindow();
 
     return hr;    
 }

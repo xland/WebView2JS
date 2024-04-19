@@ -48,7 +48,7 @@ STDMETHODIMP Host::GetTypeInfo(UINT iTInfo, LCID lcid, ITypeInfo** ppTInfo)
     }
     if (!m_typeLib)
     {
-        RETURN_IF_FAILED(LoadTypeLib(L"PrivateBrowser.tlb", &m_typeLib));
+        RETURN_IF_FAILED(LoadTypeLib(L"WebView2JS.tlb", &m_typeLib));
     }
     return m_typeLib->GetTypeInfoOfGuid(__uuidof(IHost), ppTInfo);
 }
