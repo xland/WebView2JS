@@ -3,6 +3,7 @@
 #include <format>
 #include <windowsx.h>
 #include <dwmapi.h>
+#include <WebView2.h>
 #include "App.h"
 
 using namespace Microsoft::WRL;
@@ -232,7 +233,7 @@ HRESULT Win::pageCtrlCallBack(HRESULT result, ICoreWebView2Controller* controlle
 {
     HRESULT hr;
 
-    ICoreWebView2* webview;
+    wil::com_ptr<ICoreWebView2> webview;
     hr = controller->get_CoreWebView2(&webview);
     webviews.push_back(webview);
     wil::com_ptr<ICoreWebView2Settings> settings;
@@ -240,12 +241,18 @@ HRESULT Win::pageCtrlCallBack(HRESULT result, ICoreWebView2Controller* controlle
     settings->put_IsScriptEnabled(TRUE);
     settings->put_AreDefaultScriptDialogsEnabled(TRUE);
     settings->put_IsWebMessageEnabled(TRUE);
+
     rapidjson::Value& wvs = config["webviews"].GetArray();
     auto index = ctrls.size();
     auto rect = areaToRect(wvs[index]["area"], w, h);
     hr = controller->put_Bounds(rect);
     ctrls.push_back(controller);
     auto url = convertToWideChar(wvs[index]["url"].GetString());
+    if (url.starts_with(L"https://wv2js/")) {
+        auto webview3 = webview.try_query<ICoreWebView2_3>();
+        webview3->SetVirtualHostNameToFolderMapping(L"wv2js", L"ui", COREWEBVIEW2_HOST_RESOURCE_ACCESS_KIND_ALLOW);
+    }
+
     hr = webview->Navigate(url.c_str());
     //webview->OpenDevToolsWindow();
 

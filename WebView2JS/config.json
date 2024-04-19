@@ -17,7 +17,7 @@
       "webviews": [
         {
           "id": "FirstWebView",
-          "url": "file:///ui\\index.html",
+          "url": "https://wv2js/index.html",
           "disableWindowOpen": null,
           "area": {
             "left": 0,

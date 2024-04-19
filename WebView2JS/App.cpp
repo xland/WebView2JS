@@ -9,7 +9,6 @@
 #include <string>
 #include <vector>
 #include <WebView2EnvironmentOptions.h>
-
 #include "Win.h"
 
 
@@ -35,20 +34,20 @@ App::App()
 		return;
 	}
 	
-	//auto options = Microsoft::WRL::Make<CoreWebView2EnvironmentOptions>();
-	//options->put_AdditionalBrowserArguments(L"--allow-file-access-from-files");
-	//Microsoft::WRL::ComPtr<ICoreWebView2EnvironmentOptions4> options4;
-	//HRESULT oeResult = options.As(&options4);
-	//if (oeResult != S_OK) {
-	//	// UNREACHABLE - cannot continue  todo
-	//}
-	//const WCHAR* allowed_origins[1] = { L"*"};
-	//auto defaultRegistration = Microsoft::WRL::Make<CoreWebView2CustomSchemeRegistration>(L"wv2js");
-	//defaultRegistration->put_HasAuthorityComponent(TRUE);
-	//defaultRegistration->put_TreatAsSecure(TRUE);
-	//defaultRegistration->SetAllowedOrigins(1, allowed_origins);
-	//ICoreWebView2CustomSchemeRegistration* registrations[1] = { defaultRegistration.Get() };
-	//options4->SetCustomSchemeRegistrations(1, static_cast<ICoreWebView2CustomSchemeRegistration**>(registrations));
+	auto options = Microsoft::WRL::Make<CoreWebView2EnvironmentOptions>();
+	options->put_AdditionalBrowserArguments(L"--allow-file-access-from-files");
+	Microsoft::WRL::ComPtr<ICoreWebView2EnvironmentOptions4> options4;
+	HRESULT oeResult = options.As(&options4);
+	if (oeResult != S_OK) {
+		// UNREACHABLE - cannot continue  todo
+	}
+	const WCHAR* allowed_origins[1] = {L"*"};
+	auto defaultRegistration = Microsoft::WRL::Make<CoreWebView2CustomSchemeRegistration>(L"wv2js");
+	defaultRegistration->put_HasAuthorityComponent(TRUE);
+	defaultRegistration->put_TreatAsSecure(TRUE);
+	defaultRegistration->SetAllowedOrigins(1, allowed_origins);
+	ICoreWebView2CustomSchemeRegistration* registrations[1] = { defaultRegistration.Get() };
+	options4->SetCustomSchemeRegistrations(1, static_cast<ICoreWebView2CustomSchemeRegistration**>(registrations));
 
 
 	auto envCBInstance = Callback<ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler>(this, &App::envCallBack);

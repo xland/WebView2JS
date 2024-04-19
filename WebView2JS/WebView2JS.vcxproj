@@ -163,7 +163,6 @@
     <ClInclude Include="HostImpl.h" />
     <ClInclude Include="Host_h.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="SchemeHandler.h" />
     <ClInclude Include="Util.h" />
     <ClInclude Include="Win.h" />
   </ItemGroup>
