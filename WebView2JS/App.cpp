@@ -20,6 +20,7 @@ namespace {
 	static App* app;
 	static rapidjson::Document d;
 	static std::vector<Win*> wins;
+	static 	std::filesystem::path appPath;
 	ICoreWebView2Environment* webViewEnv;
 }
 
@@ -29,8 +30,7 @@ App::App()
 	if (!checkRuntime()) {
 		return;
 	}
-	auto path = ensureAppFolder();
-	if (path.empty()) {
+	if (!ensureAppFolder()) {
 		return;
 	}
 	
@@ -51,7 +51,7 @@ App::App()
 
 
 	auto envCBInstance = Callback<ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler>(this, &App::envCallBack);
-	HRESULT result = CreateCoreWebView2EnvironmentWithOptions(nullptr, nullptr, nullptr/*options.Get()*/, envCBInstance.Get());
+	HRESULT result = CreateCoreWebView2EnvironmentWithOptions(nullptr, appPath.c_str(), nullptr/*options.Get()*/, envCBInstance.Get());
 	if (FAILED(result)) {
 		return;
 	}
@@ -76,6 +76,11 @@ App* App::get() {
 ICoreWebView2Environment* App::getWebViewEnv()
 {
 	return webViewEnv;
+}
+
+std::wstring App::getAppPath()
+{
+	return appPath.wstring();
 }
 
 void App::dispose()
@@ -128,27 +133,28 @@ bool App::checkRegKey(const HKEY& key, const std::wstring& subKey) {
 	}
 	return true;
 }
-std::filesystem::path App::ensureAppFolder() {
-	std::filesystem::path path;
+bool App::ensureAppFolder() {
+	
 	PWSTR pathTmp;
 	auto ret = SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, nullptr, &pathTmp);
 	if (ret != S_OK) {
 		CoTaskMemFree(pathTmp);
 		auto result = MessageBox(nullptr, L"error", L"error", MB_OK | MB_ICONINFORMATION | MB_DEFBUTTON1);
 		exit(1);
-		return path;
+		return false;
 	}
-	path = pathTmp;
+	appPath = pathTmp;
 	CoTaskMemFree(pathTmp);
-	path /= convertToWideChar(d["appName"].GetString());
-	if (!std::filesystem::exists(path)) {
-		auto flag = std::filesystem::create_directory(path);
+	appPath /= convertToWideChar(d["appName"].GetString());
+	if (!std::filesystem::exists(appPath)) {
+		auto flag = std::filesystem::create_directory(appPath);
 		if (!flag) {
 			MessageBox(nullptr, L"error", L"error", MB_OK | MB_ICONINFORMATION | MB_DEFBUTTON1);
 			exit(1);
+			return false;
 		}
 	}
-	return path;
+	return true;
 }
 
 HRESULT App::envCallBack(HRESULT result, ICoreWebView2Environment* env)

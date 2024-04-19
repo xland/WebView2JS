@@ -7,7 +7,7 @@
       "h": 800,
       "resizable": true,
       "title": "WebView2JS窗口",
-      "frame": true,
+      "frame": false,
       "shadow": true,
       "position": {
         "x": 100,

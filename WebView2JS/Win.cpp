@@ -177,16 +177,7 @@ LRESULT CALLBACK Win::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         }
     }
     case WM_NCHITTEST: {
-        if (config["frame"].GetBool()) {
-            return DefWindowProcW(hWnd, msg, wParam, lParam);
-        }
-        else {
-            POINT pt;
-            pt.x = GET_X_LPARAM(lParam);
-            pt.y = GET_Y_LPARAM(lParam);
-            ScreenToClient(hWnd, &pt);
-            return nctest(pt.x, pt.y);
-        }
+        return DefWindowProcW(hWnd, msg, wParam, lParam);
     }
     case WM_EXITSIZEMOVE: {
         RECT rect;

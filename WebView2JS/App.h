@@ -16,12 +16,13 @@ public:
 	static void dispose();
 	static App* get();
 	static ICoreWebView2Environment* getWebViewEnv();
+	static std::wstring getAppPath();
 private:
 	App();
 	void initConfig();
 	bool checkRuntime();
 	bool checkRegKey(const HKEY& key, const std::wstring& subKey);
-	std::filesystem::path ensureAppFolder();
+	bool ensureAppFolder();
 	HRESULT envCallBack(HRESULT result, ICoreWebView2Environment* env);
 };
 
