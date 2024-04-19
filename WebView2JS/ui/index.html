@@ -3,9 +3,15 @@
 <META NAME="GENERATOR" Content="Microsoft Visual Studio">
 <TITLE></TITLE>
 </HEAD>
+<style>
+    html, body {
+        margin:0px;
+        padding:0px;
+        height:100%;
+        width:100%;
+    }
+</style>
 <BODY>
-
-    ≤‚ ‘≤‚ ‘
 <script>
 (()=>{
     // let domTitle  = document.querySelector(".title");
@@ -16,7 +22,6 @@
     // })
     document.addEventListener("mousedown",(evt)=>{
         if(evt.x>0&&evt.y>0&&evt.x<6&&evt.y<6){
-            // document.body.style = "cursor:nw-resize;"
             chrome.webview.hostObjects.sync.host.HitTest(13);//HTTOPLEFT
         }else{
             // document.body.style = ""
