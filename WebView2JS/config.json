@@ -5,6 +5,8 @@
       "id": "FirstWindow",
       "w": 1200,
       "h": 800,
+      "miniWidth": 1200,
+      "miniHeight": 800,
       "resizable": true,
       "title": "WebView2JS窗口",
       "frame": false,
