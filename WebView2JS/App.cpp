@@ -11,9 +11,6 @@
 #include <WebView2EnvironmentOptions.h>
 #include "Win.h"
 
-
-
-
 using namespace Microsoft::WRL;
 
 namespace {
@@ -21,7 +18,7 @@ namespace {
 	static rapidjson::Document d;
 	static std::vector<Win*> wins;
 	static 	std::filesystem::path appPath;
-	ICoreWebView2Environment* webViewEnv;
+	static ICoreWebView2Environment* webViewEnv;
 }
 
 App::App()
@@ -33,23 +30,7 @@ App::App()
 	if (!ensureAppFolder()) {
 		return;
 	}
-	
-	auto options = Microsoft::WRL::Make<CoreWebView2EnvironmentOptions>();
-	options->put_AdditionalBrowserArguments(L"--allow-file-access-from-files");
-	Microsoft::WRL::ComPtr<ICoreWebView2EnvironmentOptions4> options4;
-	HRESULT oeResult = options.As(&options4);
-	if (oeResult != S_OK) {
-		// UNREACHABLE - cannot continue  todo
-	}
-	const WCHAR* allowed_origins[1] = {L"*"};
-	auto defaultRegistration = Microsoft::WRL::Make<CoreWebView2CustomSchemeRegistration>(L"wv2js");
-	defaultRegistration->put_HasAuthorityComponent(TRUE);
-	defaultRegistration->put_TreatAsSecure(TRUE);
-	defaultRegistration->SetAllowedOrigins(1, allowed_origins);
-	ICoreWebView2CustomSchemeRegistration* registrations[1] = { defaultRegistration.Get() };
-	options4->SetCustomSchemeRegistrations(1, static_cast<ICoreWebView2CustomSchemeRegistration**>(registrations));
-
-
+	regScheme();
 	auto envCBInstance = Callback<ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler>(this, &App::envCallBack);
 	HRESULT result = CreateCoreWebView2EnvironmentWithOptions(nullptr, appPath.c_str(), nullptr/*options.Get()*/, envCBInstance.Get());
 	if (FAILED(result)) {
@@ -72,6 +53,10 @@ void App::init() {
 App* App::get() {
 	return app;
 }
+void App::dispose()
+{
+	delete app;
+}
 
 ICoreWebView2Environment* App::getWebViewEnv()
 {
@@ -83,10 +68,7 @@ std::wstring App::getAppPath()
 	return appPath.wstring();
 }
 
-void App::dispose()
-{
-	delete app;
-}
+
 void App::initConfig()
 {
 	//auto configPath = std::filesystem::canonical(std::filesystem::current_path() / "config.json");
@@ -94,6 +76,24 @@ void App::initConfig()
 	std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 	//auto str = convertToWideChar(content);
 	d.Parse(content.c_str());
+}
+
+void App::regScheme()
+{
+	auto options = Microsoft::WRL::Make<CoreWebView2EnvironmentOptions>();
+	options->put_AdditionalBrowserArguments(L"--allow-file-access-from-files");
+	Microsoft::WRL::ComPtr<ICoreWebView2EnvironmentOptions4> options4;
+	HRESULT oeResult = options.As(&options4);
+	if (oeResult != S_OK) {
+		// UNREACHABLE - cannot continue  todo
+	}
+	const WCHAR* allowed_origins[1] = { L"*" };
+	auto defaultRegistration = Microsoft::WRL::Make<CoreWebView2CustomSchemeRegistration>(L"wv2js");
+	defaultRegistration->put_HasAuthorityComponent(TRUE);
+	defaultRegistration->put_TreatAsSecure(TRUE);
+	defaultRegistration->SetAllowedOrigins(1, allowed_origins);
+	ICoreWebView2CustomSchemeRegistration* registrations[1] = { defaultRegistration.Get() };
+	options4->SetCustomSchemeRegistrations(1, static_cast<ICoreWebView2CustomSchemeRegistration**>(registrations));
 }
 
 bool App::checkRuntime()
@@ -133,8 +133,7 @@ bool App::checkRegKey(const HKEY& key, const std::wstring& subKey) {
 	}
 	return true;
 }
-bool App::ensureAppFolder() {
-	
+bool App::ensureAppFolder() {	
 	PWSTR pathTmp;
 	auto ret = SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, nullptr, &pathTmp);
 	if (ret != S_OK) {

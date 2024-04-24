@@ -28,6 +28,7 @@ Win::~Win()
     }
 }
 
+
 void Win::initSizeAndPos()
 {
     w = config["w"].GetInt();
@@ -65,7 +66,7 @@ void Win::initWindow()
         return;
     }
     auto title = convertToWideChar(config["title"].GetString());
-    hwnd = CreateWindowEx(NULL, wcx.lpszClassName, title.c_str(), WS_VISIBLE | WS_OVERLAPPEDWINDOW,
+    hwnd = CreateWindowEx(NULL, wcx.lpszClassName, title.c_str(), WS_VISIBLE | WS_OVERLAPPEDWINDOW| WS_CLIPCHILDREN,
         x, y, w, h, NULL, NULL, hinstance, static_cast<LPVOID>(this));
     if (!config["frame"].GetBool()) {
         //rgn = CreateRectRgn(0, 0, 0, 0);
@@ -177,7 +178,9 @@ LRESULT CALLBACK Win::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         }
     }
     case WM_NCHITTEST: {
-        return DefWindowProcW(hWnd, msg, wParam, lParam);
+        auto x = GET_X_LPARAM(lParam);
+        auto y = GET_Y_LPARAM(lParam);
+        return nctest(x, y);
     }
     case WM_EXITSIZEMOVE: {
         RECT rect;
@@ -220,6 +223,21 @@ bool Win::createPageController()
     return true;
 }
 
+
+
+BOOL CALLBACK EnumChildProc(HWND hwndChild, LPARAM lParam) {
+    wchar_t clsNameBuffer[MAX_PATH] = { 0 };
+    int length = GetClassName(hwndChild, clsNameBuffer, MAX_PATH);
+    std::wstring clsName(clsNameBuffer);
+    // 如果获取成功（返回非零值），则构造std::wstring对象
+    if (clsName.ends_with(L"RenderWidgetHostHWND"))
+    {
+        return TRUE;
+    }
+    return TRUE;
+}
+
+
 HRESULT Win::pageCtrlCallBack(HRESULT result, ICoreWebView2Controller* controller)
 {
     HRESULT hr;
@@ -245,15 +263,83 @@ HRESULT Win::pageCtrlCallBack(HRESULT result, ICoreWebView2Controller* controlle
         webview3->SetVirtualHostNameToFolderMapping(L"wv2js", L"ui", COREWEBVIEW2_HOST_RESOURCE_ACCESS_KIND_ALLOW);
     }
 
-    hostObj = Microsoft::WRL::Make<Host>(this);
-    VARIANT remoteObjectAsVariant = {};
-    hostObj.query_to<IDispatch>(&remoteObjectAsVariant.pdispVal);
-    remoteObjectAsVariant.vt = VT_DISPATCH;
-    webview->AddHostObjectToScript(L"host", &remoteObjectAsVariant);
-    remoteObjectAsVariant.pdispVal->Release();
+    //hostObj = Microsoft::WRL::Make<Host>(this);
+    //VARIANT remoteObjectAsVariant = {};
+    //hostObj.query_to<IDispatch>(&remoteObjectAsVariant.pdispVal);
+    //remoteObjectAsVariant.vt = VT_DISPATCH;
+    //webview->AddHostObjectToScript(L"host", &remoteObjectAsVariant);
+    //remoteObjectAsVariant.pdispVal->Release();
+
+    auto navigateCB = Callback<ICoreWebView2NavigationCompletedEventHandler>(this, &Win::navigationCompleted);
+    webview->add_NavigationCompleted(navigateCB.Get(), nullptr);
+
+    EventRegistrationToken token;
+    auto messageReceivedCB = Callback<ICoreWebView2WebMessageReceivedEventHandler>(this, &Win::messageReceived);
+    webview->add_WebMessageReceived(messageReceivedCB.Get(), &token);
+    
+    //webview->add_WebMessageReceived(Callback<ICoreWebView2WebMessageReceivedEventHandler>(
+    //    [](ICoreWebView2* webview, ICoreWebView2WebMessageReceivedEventArgs* args) -> HRESULT {
+    //        wil::unique_cotaskmem_string message;
+    //        args->TryGetWebMessageAsString(&message);
+    //        // processMessage(&message);
+    //        webview->PostWebMessageAsString(message.get());
+    //        return S_OK;
+    //    }).Get(), &token);
+
+    std::wstring script = L"console.log(123);window.chrome.webview.postMessage(window.document.URL);console.log(456);";
+    hr = webview->AddScriptToExecuteOnDocumentCreated(script.c_str(), nullptr);
+
 
     hr = webview->Navigate(url.c_str());
     webview->OpenDevToolsWindow();
 
+    //EnumChildWindows(hwnd, EnumChildProc, NULL);
+    
+
     return hr;    
+}
+
+WNDPROC subWinProcOld;
+
+LRESULT subWinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, UINT_PTR subclassID, DWORD_PTR refData)
+{
+    switch (msg)
+    {
+    case WM_CREATE: {
+        LRESULT result = DefSubclassProc(hwnd, msg, wParam, lParam);
+        return result;
+    }
+    case WM_NCHITTEST: {
+        auto x = GET_X_LPARAM(lParam);
+        auto y = GET_Y_LPARAM(lParam);
+        if (x < 6 && y < 6) {
+            return HTTRANSPARENT;
+        }
+        break;
+    }
+    }
+    return CallWindowProc(subWinProcOld, hwnd, msg, wParam, lParam);
+}
+
+HRESULT Win::navigationCompleted(ICoreWebView2* webview, ICoreWebView2NavigationCompletedEventArgs* args)
+{
+    HWND subHwnd0 = FindWindowEx(hwnd, nullptr, L"Chrome_WidgetWin_0", nullptr);
+    HWND subHwnd1 = FindWindowEx(subHwnd0, nullptr, L"Chrome_WidgetWin_1", nullptr);
+    HWND subHwnd = FindWindowEx(subHwnd1, nullptr, L"Intermediate D3D Window", nullptr);
+
+    //SetWindowSubclass(subHwnd0, subWinProc, 1, NULL);
+    //SetWindowSubclass(subHwnd1, subWinProc, 1, NULL);
+    SetWindowSubclass(subHwnd, subWinProc, 1, NULL);
+
+
+    subWinProcOld = (WNDPROC)SetWindowLongPtr(subHwnd1, GWLP_WNDPROC, (LONG_PTR)subWinProc);
+    return S_OK;
+}
+
+HRESULT Win::messageReceived(ICoreWebView2* webview, ICoreWebView2WebMessageReceivedEventArgs* args)
+{
+    //HWND subHwnd0 = FindWindowEx(hwnd, nullptr, L"Chrome_WidgetWin_0", nullptr);
+    //HWND subHwnd1 = FindWindowEx(subHwnd0, nullptr, L"Chrome_WidgetWin_1", nullptr);
+    //HWND subHwnd = FindWindowEx(subHwnd1, nullptr, L"Intermediate D3D Window", nullptr);
+    return S_OK;
 }

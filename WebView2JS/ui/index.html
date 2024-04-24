@@ -1,38 +1,131 @@
 ﻿<HTML>
+
 <HEAD>
-<META NAME="GENERATOR" Content="Microsoft Visual Studio">
-<TITLE></TITLE>
+    <META NAME="GENERATOR" Content="Microsoft Visual Studio">
+    <TITLE></TITLE>
 </HEAD>
 <style>
-    html, body {
-        margin:0px;
-        padding:0px;
-        height:100%;
-        width:100%;
+    html,
+    body {
+        margin: 0px;
+        padding: 0px;
+        height: 100%;
+        width: 100%;
+    }
+
+    .topBorder {
+        z-index: 999999;
+        position: absolute;
+        top: 0px;
+        height: 6px;
+        left: 0px;
+        right: 0px;
+        display: flex;
+    }
+
+    .topBorderLeft {
+        width: 6px;
+        height: 6px;
+        cursor: nwse-resize;
+    }
+
+    .topBorderCenter {
+        flex: 1;
+        height: 6px;
+        cursor: ns-resize;
+    }
+
+    .topBorderRight {
+        width: 6px;
+        height: 6px;
+        cursor: nesw-resize;
+    }
+
+    .leftBorder {
+        z-index: 999999;
+        position: absolute;
+        top: 6px;
+        bottom: 6px;
+        left: 0px;
+        width: 6px;
+        cursor: ew-resize;
+    }
+
+    .rightBorder {
+        z-index: 999999;
+        position: absolute;
+        top: 6px;
+        bottom: 6px;
+        right: 0px;
+        width: 6px;
+        cursor: ew-resize;
+    }
+
+    .bottomBorder {
+        z-index: 999999;
+        position: absolute;
+        bottom: 0px;
+        height: 6px;
+        left: 0px;
+        right: 0px;
+        display: flex;
+    }
+
+    .bottomBorderLeft {
+        width: 6px;
+        height: 6px;
+        cursor: nesw-resize;
+    }
+
+    .bottomBorderCenter {
+        flex: 1;
+        height: 6px;
+        cursor: ns-resize;
+    }
+
+    .bottomBorderRight {
+        width: 6px;
+        height: 6px;
+        cursor: nwse-resize;
     }
 </style>
-<BODY>
-<script>
-(()=>{
-    // let domTitle  = document.querySelector(".title");
-    // domTitle.addEventListener("mousedown",(evt)=>{
-    //     chrome.webview.hostObjects.sync.host.MouseDownDrag();
-    //     evt.preventDefault();
-    //     evt.stopPropagation();
-    // })
-    document.addEventListener("mousedown",(evt)=>{
-        if(evt.x>0&&evt.y>0&&evt.x<6&&evt.y<6){
-            chrome.webview.hostObjects.sync.host.HitTest(13);//HTTOPLEFT
-        }else{
-            // document.body.style = ""
-        }
-        
-        
-        evt.preventDefault();
-        evt.stopPropagation();
-    })
 
-})()
+<BODY>
+    <div class="topBorder">
+        <div class="topBorderLeft"></div>
+        <div class="topBorderCenter"></div>
+        <div class="topBorderRight"></div>
+    </div>
+    <div class="leftBorder"></div>
+    <div class="rightBorder"></div>
+    <div class="bottomBorder">
+        <div class="bottomBorderLeft"></div>
+        <div class="bottomBorderCenter"></div>
+        <div class="bottomBorderRight"></div>
+    </div>
+    测试测试测试
+    <script>
+        (() => {
+            // let domTitle  = document.querySelector(".title");
+            // domTitle.addEventListener("mousedown",(evt)=>{
+            //     chrome.webview.hostObjects.sync.host.MouseDownDrag();
+            //     evt.preventDefault();
+            //     evt.stopPropagation();
+            // })
+            document.addEventListener("mousedown", (evt) => {
+                if (evt.x > 0 && evt.y > 0 && evt.x < 6 && evt.y < 6) {
+                    chrome.webview.hostObjects.sync.host.HitTest(13);//HTTOPLEFT
+                } else {
+                    // document.body.style = ""
+                }
+
+
+                evt.preventDefault();
+                evt.stopPropagation();
+            })
+
+        })()
     </script>
 </BODY>
+
 </HTML>
