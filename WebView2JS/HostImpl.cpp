@@ -8,6 +8,7 @@ Host::Host(Win* win):win{win}
 STDMETHODIMP Host::HitTest(int htValue)
 {
     ReleaseCapture();
+    //SetCapture(win->hwnd);
     SendMessage(win->hwnd, WM_NCLBUTTONDOWN, htValue, 0);
     return S_OK;
 }

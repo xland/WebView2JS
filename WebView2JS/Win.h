@@ -12,17 +12,14 @@ class Win
 public:
 	Win(rapidjson::Value& config);
 	~Win();
-	bool createPageController();
 	int x, y, w, h;
 	HWND hwnd;
 private:
 	static LRESULT CALLBACK RouteWindowMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT CALLBACK wndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
-
 	void initSizeAndPos();
 	void initWindow();
-	int nctest(const int& x, const int& y);
-	//void initCaptionArea();
+	bool createPageController();
 	HRESULT pageCtrlCallBack(HRESULT result, ICoreWebView2Controller* controller);
 	HRESULT navigationCompleted(ICoreWebView2* webview, ICoreWebView2NavigationCompletedEventArgs* args);
 	HRESULT messageReceived(ICoreWebView2* webview, ICoreWebView2WebMessageReceivedEventArgs* args);
@@ -30,6 +27,5 @@ private:
 	std::vector<wil::com_ptr<ICoreWebView2Controller>> ctrls;
 	std::vector<wil::com_ptr<ICoreWebView2>> webviews;
 	wil::com_ptr<Host> hostObj;
-	//HRGN rgn;
 };
 

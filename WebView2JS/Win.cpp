@@ -81,41 +81,6 @@ void Win::initWindow()
 
 }
 
-int Win::nctest(const int& x, const int& y)
-{
-    int size{ 6 };
-    if (x < size && y < size) {
-        return HTTOPLEFT;
-    }
-    else if (x > size && y < size && x < w - size) {
-        return HTTOP;
-    }
-    else if (y < size && x > w - size) {
-        return HTTOPRIGHT;
-    }
-    else if (y > size && y<h - size && x > w - size) {
-        return HTRIGHT;
-    }
-    else if (y > h - size && x > w - size) {
-        return HTBOTTOMRIGHT;
-    }
-    else if (x > size && y > h - size && x < w - size) {
-        return HTBOTTOM;
-    }
-    else if (x < size && y > h - size) {
-        return HTBOTTOMLEFT;
-    }
-    else if (x < size && y < h - size && y>size) {
-        return HTLEFT;
-    }
-    //else if (PtInRegion(rgn, x, y)) {
-    //    return HTCAPTION;
-    //}
-    else {
-        return HTCLIENT;
-    }
-}
-
 //void Win::initCaptionArea()
 //{
 //    SetRectRgn(rgn, 0, 0, 0, 0);
@@ -136,9 +101,10 @@ LRESULT CALLBACK Win::RouteWindowMessage(HWND hWnd, UINT msg, WPARAM wParam, LPA
         CREATESTRUCT* pCS = reinterpret_cast<CREATESTRUCT*>(lParam);
         LPVOID pThis = pCS->lpCreateParams;
         SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pThis));
+        auto that = static_cast<Win*>(pThis);
+        that->hwnd = hWnd;
     }
-    auto obj = reinterpret_cast<Win*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
-    if (obj) {
+    else if (auto obj = reinterpret_cast<Win*>(GetWindowLongPtr(hWnd, GWLP_USERDATA))) {
         return obj->wndProc(hWnd, msg, wParam, lParam);
     }
     return DefWindowProc(hWnd, msg, wParam, lParam);
@@ -153,10 +119,7 @@ LRESULT CALLBACK Win::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         if (config["frame"].GetBool()) {
             return DefWindowProcW(hWnd, msg, wParam, lParam);
         }
-        else
-        {
-            return true;
-        }
+        return 0;
     }
     case WM_GETMINMAXINFO:
     {
@@ -174,20 +137,16 @@ LRESULT CALLBACK Win::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             mminfo->ptMaxSize.y = workArea.bottom - workArea.top - 2;
             mminfo->ptMaxPosition.x = 1;
             mminfo->ptMaxPosition.y = 1;
-            return true;
         }
+        return 0;
     }
-    case WM_NCHITTEST: {
-        auto x = GET_X_LPARAM(lParam);
-        auto y = GET_Y_LPARAM(lParam);
-        return nctest(x, y);
-    }
+
     case WM_EXITSIZEMOVE: {
         RECT rect;
         GetWindowRect(hWnd, &rect);
         this->x = rect.left;
         this->y = rect.top;
-        return true;
+        return 0;
     }
     case WM_SIZE: {
         this->w = LOWORD(lParam);
@@ -197,15 +156,16 @@ LRESULT CALLBACK Win::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         {            
             auto rect = areaToRect(wvs[i]["area"], w, h);
             ctrls[i]->SetBoundsAndZoomFactor(rect, 1.0);
+            
         }
-        return true;
+        return 0;
     }
     case WM_DESTROY: {
         PostQuitMessage(0);
-        break;
+        return 0;
     }
     }
-    return DefWindowProcW(hWnd, msg, wParam, lParam);
+    return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
 bool Win::createPageController()
@@ -263,12 +223,12 @@ HRESULT Win::pageCtrlCallBack(HRESULT result, ICoreWebView2Controller* controlle
         webview3->SetVirtualHostNameToFolderMapping(L"wv2js", L"ui", COREWEBVIEW2_HOST_RESOURCE_ACCESS_KIND_ALLOW);
     }
 
-    //hostObj = Microsoft::WRL::Make<Host>(this);
-    //VARIANT remoteObjectAsVariant = {};
-    //hostObj.query_to<IDispatch>(&remoteObjectAsVariant.pdispVal);
-    //remoteObjectAsVariant.vt = VT_DISPATCH;
-    //webview->AddHostObjectToScript(L"host", &remoteObjectAsVariant);
-    //remoteObjectAsVariant.pdispVal->Release();
+    hostObj = Microsoft::WRL::Make<Host>(this);
+    VARIANT remoteObjectAsVariant = {};
+    hostObj.query_to<IDispatch>(&remoteObjectAsVariant.pdispVal);
+    remoteObjectAsVariant.vt = VT_DISPATCH;
+    webview->AddHostObjectToScript(L"host", &remoteObjectAsVariant);
+    remoteObjectAsVariant.pdispVal->Release();
 
     auto navigateCB = Callback<ICoreWebView2NavigationCompletedEventHandler>(this, &Win::navigationCompleted);
     webview->add_NavigationCompleted(navigateCB.Get(), nullptr);
@@ -299,40 +259,8 @@ HRESULT Win::pageCtrlCallBack(HRESULT result, ICoreWebView2Controller* controlle
     return hr;    
 }
 
-WNDPROC subWinProcOld;
-
-LRESULT subWinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, UINT_PTR subclassID, DWORD_PTR refData)
-{
-    switch (msg)
-    {
-    case WM_CREATE: {
-        LRESULT result = DefSubclassProc(hwnd, msg, wParam, lParam);
-        return result;
-    }
-    case WM_NCHITTEST: {
-        auto x = GET_X_LPARAM(lParam);
-        auto y = GET_Y_LPARAM(lParam);
-        if (x < 6 && y < 6) {
-            return HTTRANSPARENT;
-        }
-        break;
-    }
-    }
-    return CallWindowProc(subWinProcOld, hwnd, msg, wParam, lParam);
-}
-
 HRESULT Win::navigationCompleted(ICoreWebView2* webview, ICoreWebView2NavigationCompletedEventArgs* args)
 {
-    HWND subHwnd0 = FindWindowEx(hwnd, nullptr, L"Chrome_WidgetWin_0", nullptr);
-    HWND subHwnd1 = FindWindowEx(subHwnd0, nullptr, L"Chrome_WidgetWin_1", nullptr);
-    HWND subHwnd = FindWindowEx(subHwnd1, nullptr, L"Intermediate D3D Window", nullptr);
-
-    //SetWindowSubclass(subHwnd0, subWinProc, 1, NULL);
-    //SetWindowSubclass(subHwnd1, subWinProc, 1, NULL);
-    SetWindowSubclass(subHwnd, subWinProc, 1, NULL);
-
-
-    subWinProcOld = (WNDPROC)SetWindowLongPtr(subHwnd1, GWLP_WNDPROC, (LONG_PTR)subWinProc);
     return S_OK;
 }
 
@@ -341,5 +269,10 @@ HRESULT Win::messageReceived(ICoreWebView2* webview, ICoreWebView2WebMessageRece
     //HWND subHwnd0 = FindWindowEx(hwnd, nullptr, L"Chrome_WidgetWin_0", nullptr);
     //HWND subHwnd1 = FindWindowEx(subHwnd0, nullptr, L"Chrome_WidgetWin_1", nullptr);
     //HWND subHwnd = FindWindowEx(subHwnd1, nullptr, L"Intermediate D3D Window", nullptr);
+
+    //wil::unique_cotaskmem_string messageRaw;
+    //std::wstring message = messageRaw.get();
+    //ReleaseCapture();
+    //SendMessage(hwnd, WM_NCLBUTTONDOWN, 13, 0);
     return S_OK;
 }

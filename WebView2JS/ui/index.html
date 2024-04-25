@@ -88,6 +88,11 @@
         height: 6px;
         cursor: nwse-resize;
     }
+
+    .titleBar {
+        height: 40px;
+        background: lightskyblue;
+    }
 </style>
 
 <BODY>
@@ -103,26 +108,62 @@
         <div class="bottomBorderCenter"></div>
         <div class="bottomBorderRight"></div>
     </div>
+    <div class="titleBar">
+
+    </div>
     测试测试测试
     <script>
         (() => {
+            let hitTest = (e, val) => {
+                e.preventDefault();
+                e.stopPropagation();
+                chrome.webview.hostObjects.sync.host.HitTest(val);
+            }
+            let leftTop = document.querySelector(".topBorderLeft");
+            leftTop.addEventListener("mousedown", (e) => {
+                hitTest(e, 13);
+            })
+            let topBorderLeft = document.querySelector(".topBorderCenter");
+            topBorderLeft.addEventListener("mousedown", (e) => {
+                hitTest(e, 12);
+            })
+            let topBorderRight = document.querySelector(".topBorderRight");
+            topBorderRight.addEventListener("mousedown", (e) => {
+                hitTest(e, 14);
+            })
+            let leftBorder = document.querySelector(".leftBorder");
+            leftBorder.addEventListener("mousedown", (e) => {
+                hitTest(e, 10);
+            })
+            let rightBorder = document.querySelector(".rightBorder");
+            rightBorder.addEventListener("mousedown", (e) => {
+                hitTest(e, 11);
+            })
+            let bottomBorderLeft = document.querySelector(".bottomBorderLeft");
+            bottomBorderLeft.addEventListener("mousedown", (e) => {
+                hitTest(e, 16);
+            })
+            let bottomBorderCenter = document.querySelector(".bottomBorderCenter");
+            bottomBorderCenter.addEventListener("mousedown", (e) => {
+                hitTest(e, 15);
+            })
+            let bottomBorderRight = document.querySelector(".bottomBorderRight");
+            bottomBorderRight.addEventListener("mousedown", (e) => {
+                hitTest(e, 17);
+            })
+            let titleBar = document.querySelector(".titleBar");
+            titleBar.addEventListener("mousedown", (e) => {
+                hitTest(e, 2);
+            })
+
+
             // let domTitle  = document.querySelector(".title");
             // domTitle.addEventListener("mousedown",(evt)=>{
             //     chrome.webview.hostObjects.sync.host.MouseDownDrag();
             //     evt.preventDefault();
             //     evt.stopPropagation();
             // })
-            document.addEventListener("mousedown", (evt) => {
-                if (evt.x > 0 && evt.y > 0 && evt.x < 6 && evt.y < 6) {
-                    chrome.webview.hostObjects.sync.host.HitTest(13);//HTTOPLEFT
-                } else {
-                    // document.body.style = ""
-                }
 
-
-                evt.preventDefault();
-                evt.stopPropagation();
-            })
 
         })()
     </script>
