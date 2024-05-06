@@ -15,23 +15,19 @@ STDMETHODIMP Host::HitTest(int htValue)
 
 STDMETHODIMP Host::MinimizeWindow()
 {
-
     return S_OK;
 }
 STDMETHODIMP Host::MaximizeWindow()
 {
-
     return S_OK;
 }
 STDMETHODIMP Host::CloseWindow()
 {
-    //win->CreatePageController();
-    //win->controller->put_IsVisible(false);
+    PostMessage(win->hwnd, WM_CLOSE, 0, 0);
     return S_OK;
 }
 STDMETHODIMP Host::RestoreWindow()
 {
-
     return S_OK;
 }
 

@@ -66,6 +66,9 @@
     <Midl Include="Host.idl">
       <Filter>源文件</Filter>
     </Midl>
+    <Midl Include="Allen.idl">
+      <Filter>源文件</Filter>
+    </Midl>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="$(MSBuildThisFileDirectory)..\..\natvis\wil.natvis" />

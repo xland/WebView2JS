@@ -177,6 +177,7 @@
     </CopyFileToFolders>
   </ItemGroup>
   <ItemGroup>
+    <Midl Include="Allen.idl" />
     <Midl Include="Host.idl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

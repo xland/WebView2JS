@@ -17,7 +17,6 @@ Win::Win(rapidjson::Value& config):config{config}
 
 Win::~Win()
 {
-    //DeleteObject(rgn);
     for (size_t i = 0; i < webviews.size(); i++)
     {
         webviews[i]->Release();
@@ -217,6 +216,7 @@ HRESULT Win::pageCtrlCallBack(HRESULT result, ICoreWebView2Controller* controlle
     auto rect = areaToRect(wvs[index]["area"], w, h);
     hr = controller->put_Bounds(rect);
     ctrls.push_back(controller);
+
     auto url = convertToWideChar(wvs[index]["url"].GetString());
     if (url.starts_with(L"https://wv2js/")) {
         auto webview3 = webview.try_query<ICoreWebView2_3>();
@@ -246,8 +246,8 @@ HRESULT Win::pageCtrlCallBack(HRESULT result, ICoreWebView2Controller* controlle
     //        return S_OK;
     //    }).Get(), &token);
 
-    std::wstring script = L"console.log(123);window.chrome.webview.postMessage(window.document.URL);console.log(456);";
-    hr = webview->AddScriptToExecuteOnDocumentCreated(script.c_str(), nullptr);
+    //std::wstring script = L"console.log(123);window.chrome.webview.postMessage({\"name\":123 });console.log(456);";
+    //hr = webview->AddScriptToExecuteOnDocumentCreated(script.c_str(), nullptr);
 
 
     hr = webview->Navigate(url.c_str());
@@ -266,13 +266,11 @@ HRESULT Win::navigationCompleted(ICoreWebView2* webview, ICoreWebView2Navigation
 
 HRESULT Win::messageReceived(ICoreWebView2* webview, ICoreWebView2WebMessageReceivedEventArgs* args)
 {
-    //HWND subHwnd0 = FindWindowEx(hwnd, nullptr, L"Chrome_WidgetWin_0", nullptr);
-    //HWND subHwnd1 = FindWindowEx(subHwnd0, nullptr, L"Chrome_WidgetWin_1", nullptr);
-    //HWND subHwnd = FindWindowEx(subHwnd1, nullptr, L"Intermediate D3D Window", nullptr);
-
-    //wil::unique_cotaskmem_string messageRaw;
-    //std::wstring message = messageRaw.get();
-    //ReleaseCapture();
-    //SendMessage(hwnd, WM_NCLBUTTONDOWN, 13, 0);
+    wil::unique_cotaskmem_string messageRaw;
+    //args->TryGetWebMessageAsString(&messageRaw);
+    args->get_WebMessageAsJson(&messageRaw);
+    std::wstring message = messageRaw.get();
+    //webview->PostWebMessageAsString(L"allen");
+    //webview->PostWebMessageAsJson(L"{\"name\":123 }");
     return S_OK;
 }

@@ -92,6 +92,24 @@
     .titleBar {
         height: 40px;
         background: lightskyblue;
+        display:flex;
+    }
+    .titleArea{
+        flex:1;
+    }
+    .windowBtnBox{
+        width:120px;
+        display:flex;
+    }
+    .windowBtn{
+        flex:1;
+        text-align:center;
+        line-height:40px;
+        cursor:pointer;
+    }
+    .windowBtn:hover{
+        background:#ff6a00;
+        color:#fff;
     }
 </style>
 
@@ -109,11 +127,19 @@
         <div class="bottomBorderRight"></div>
     </div>
     <div class="titleBar">
-
+        <div class="titleArea"></div>
+        <div class="windowBtnBox">
+            <div class="windowBtn"></div>
+            <div class="windowBtn"></div>
+            <div id="closeBtn" class="windowBtn">X</div>
+        </div>
     </div>
     测试测试测试
     <script>
         (() => {
+            window.chrome.webview.addEventListener("message", (e) => {
+                console.log(e);
+            })
             let hitTest = (e, val) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -155,6 +181,12 @@
             titleBar.addEventListener("mousedown", (e) => {
                 hitTest(e, 2);
             })
+let closeBtn = document.getElementById("closeBtn");
+closeBtn.addEventListener("mousedown", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    chrome.webview.hostObjects.sync.host.CloseWindow();
+})
 
 
             // let domTitle  = document.querySelector(".title");
@@ -163,7 +195,7 @@
             //     evt.preventDefault();
             //     evt.stopPropagation();
             // })
-
+            //window.chrome.webview.postMessage({ name :1234 })
 
         })()
     </script>
