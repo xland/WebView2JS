@@ -50,16 +50,14 @@ STDMETHODIMP Host::GetTypeInfo(UINT iTInfo, LCID lcid, ITypeInfo** ppTInfo)
     return m_typeLib->GetTypeInfoOfGuid(__uuidof(IHost), ppTInfo);
 }
 
-STDMETHODIMP Host::GetIDsOfNames(
-    REFIID riid, LPOLESTR* rgszNames, UINT cNames, LCID lcid, DISPID* rgDispId)
+STDMETHODIMP Host::GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames, UINT cNames, LCID lcid, DISPID* rgDispId)
 {
     wil::com_ptr<ITypeInfo> typeInfo;
     RETURN_IF_FAILED(GetTypeInfo(0, lcid, &typeInfo));
     return typeInfo->GetIDsOfNames(rgszNames, cNames, rgDispId);
 }
 
-STDMETHODIMP Host::Invoke(
-    DISPID dispIdMember, REFIID riid, LCID lcid, WORD wFlags, DISPPARAMS* pDispParams,
+STDMETHODIMP Host::Invoke(DISPID dispIdMember, REFIID riid, LCID lcid, WORD wFlags, DISPPARAMS* pDispParams,
     VARIANT* pVarResult, EXCEPINFO* pExcepInfo, UINT* puArgErr)
 {
     wil::com_ptr<ITypeInfo> typeInfo;
