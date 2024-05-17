@@ -206,9 +206,14 @@ HRESULT Win::pageCtrlCallBack(HRESULT result, ICoreWebView2Controller* controlle
     webviews.push_back(webview);
     wil::com_ptr<ICoreWebView2Settings> settings;
     webview->get_Settings(&settings);
+
     settings->put_IsScriptEnabled(TRUE);
     settings->put_AreDefaultScriptDialogsEnabled(TRUE);
     settings->put_IsWebMessageEnabled(TRUE);
+
+    //wil::com_ptr<ICoreWebView2Settings8> settings8;
+    //settings->QueryInterface(IID_PPV_ARGS(&settings8));
+    //settings8->put_IsReputationCheckingRequired(false);
 
 
     rapidjson::Value& wvs = config["webviews"].GetArray();
@@ -248,13 +253,11 @@ HRESULT Win::pageCtrlCallBack(HRESULT result, ICoreWebView2Controller* controlle
 
     //std::wstring script = L"console.log(123);window.chrome.webview.postMessage({\"name\":123 });console.log(456);";
     //hr = webview->AddScriptToExecuteOnDocumentCreated(script.c_str(), nullptr);
-
-
     hr = webview->Navigate(url.c_str());
+#ifdef DEBUG
     webview->OpenDevToolsWindow();
-
-    //EnumChildWindows(hwnd, EnumChildProc, NULL);
-    
+#endif // DEBUG
+    //EnumChildWindows(hwnd, EnumChildProc, NULL);   
 
     return hr;    
 }
