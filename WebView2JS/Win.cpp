@@ -1,4 +1,4 @@
-#include "Win.h"
+ï»¿#include "Win.h"
 #include "Util.h"
 #include <format>
 #include <windowsx.h>
@@ -61,7 +61,7 @@ void Win::initWindow()
     wcx.lpszClassName = clsName.c_str();
     if (!RegisterClassEx(&wcx))
     {
-        MessageBox(NULL, L"×¢²á´°¿ÚÀàÊ§°Ü", L"ÏµÍ³ÌáÊ¾", NULL);
+        MessageBox(NULL, L"æ³¨å†Œçª—å£ç±»å¤±è´¥", L"ç³»ç»Ÿæç¤º", NULL);
         return;
     }
     auto title = convertToWideChar(config["title"].GetString());
@@ -188,7 +188,7 @@ BOOL CALLBACK EnumChildProc(HWND hwndChild, LPARAM lParam) {
     wchar_t clsNameBuffer[MAX_PATH] = { 0 };
     int length = GetClassName(hwndChild, clsNameBuffer, MAX_PATH);
     std::wstring clsName(clsNameBuffer);
-    // Èç¹û»ñÈ¡³É¹¦£¨·µ»Ø·ÇÁãÖµ£©£¬Ôò¹¹Ôìstd::wstring¶ÔÏó
+    // å¦‚æœè·å–æˆåŠŸï¼ˆè¿”å›éé›¶å€¼ï¼‰ï¼Œåˆ™æ„é€ std::wstringå¯¹è±¡
     if (clsName.ends_with(L"RenderWidgetHostHWND"))
     {
         return TRUE;
